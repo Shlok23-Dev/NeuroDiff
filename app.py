@@ -128,17 +128,15 @@ def init_session_state():
 
 @st.cache_resource(show_spinner=False)
 def get_client():
-    # ⚠️ OG DEV NOTE: Paste your Colab Ngrok URL right here! Ensure it ends with /v1/ ⚠️
-    NGROK_BASE_URL = "https://breeding-sheep-herbal.ngrok-free.dev/v1/"
-    
     try:
         client = OpenAI(
-            base_url=NGROK_BASE_URL,
+            base_url=st.secrets["NGROK_URL"],
             api_key="ollama", # Required by the SDK, but ignored by your local server
+            default_headers={"ngrok-skip-browser-warning": "true"} # Bypasses the 403 Ngrok warning
         )
         return client
     except Exception as e:
-        st.error(f"Failed to connect to Colab tunnel: {e}")
+        st.error(f"Failed to connect to tunnel: {e}")
         st.stop()
 
 
@@ -275,6 +273,7 @@ def render_cognitive_graph(graph: CognitiveGraph):
 
     config = AGConfig(width="100%", height=560, directed=True, physics=False, hierarchical=True, highlightColor=COLOR_ACCENT)
     agraph(nodes=ag_nodes, edges=ag_edges, config=config)
+
 
 # ====================================================================
 # 9. MAIN APP FLOW
